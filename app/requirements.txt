@@ -1,0 +1,2 @@
+# Runtime (Python 3.14, Windows x64)
+PySide6-Essentials==6.12.0

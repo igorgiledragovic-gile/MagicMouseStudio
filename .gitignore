@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+app/.venv/
+.venv/
+
+# Build output (the installer and driver binaries are published as GitHub Releases)
+installer/build/
+installer/Output/
+driver/out/
+app/native/out/
+app/mmstudio/mmshook.exp
+app/mmstudio/mmshook.lib
+app/mmstudio/mmshook.old-*.dll
+*.pdb
+*.obj
+
+# Local captures, logs and machine state (can contain device addresses)
+app/captures/
+*.log
+
+# Signing material - never commit keys or certificates
+*.pfx
+*.p12
+*.cer
+*.snk
+
+# Local tooling
+graphify-out/
+.claude/
+.vscode/
+.idea/
+
+# One-off local check scripts
+PROVERA-POSLE-RESTARTA.cmd
