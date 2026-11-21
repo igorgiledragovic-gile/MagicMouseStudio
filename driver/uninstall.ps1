@@ -16,6 +16,18 @@ foreach ($e in 'USB', 'BTHENUM') {
 }
 sc.exe stop mmsfilter | Out-Host
 sc.exe delete mmsfilter | Out-Host
-Remove-Item "$env:SystemRoot\System32\drivers\mmsfilter.sys" -Force -ErrorAction SilentlyContinue
-if (Test-Path "$env:SystemRoot\System32\drivers\mmsfilter.sys") { "driver file in use - removed after reboot" }
+$sysFile = "$env:SystemRoot\System32\drivers\mmsfilter.sys"
+Remove-Item $sysFile -Force -ErrorAction SilentlyContinue
+if (Test-Path $sysFile) {
+  # still loaded (e.g. an open handle to \\.\MagicMouseStudio): let Windows delete it at the next boot
+  if (-not ('MmsUninstall.Native' -as [type])) {
+    Add-Type -Namespace MmsUninstall -Name Native -MemberDefinition '[DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)] public static extern bool MoveFileEx(string existing, string target, int flags);'
+  }
+  # [NullString]::Value: a plain $null would be marshalled as "" and MoveFileEx fails with error 3
+  if ([MmsUninstall.Native]::MoveFileEx($sysFile, [NullString]::Value, 4)) {  # 4 = MOVEFILE_DELAY_UNTIL_REBOOT
+    "driver file in use - scheduled for deletion at next reboot"
+  } else {
+    "driver file in use - could not schedule deletion (error $([Runtime.InteropServices.Marshal]::GetLastWin32Error())); delete $sysFile after a reboot"
+  }
+}
 if ($Log) { Stop-Transcript | Out-Null }
